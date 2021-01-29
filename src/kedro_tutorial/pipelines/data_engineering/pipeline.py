@@ -26,30 +26,39 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Construction of the master pipeline.
+"""
+This is a boilerplate pipeline 'data_engineering'
+generated using Kedro 0.16.4
 """
 
-from typing import Dict
-
-from kedro.pipeline import Pipeline
-from .pipelines import data_engineering as de
-from .pipelines import data_science as ds
-
-def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
-    """Create the project's pipeline.
-
-    Args:
-        kwargs: Ignore any additional arguments added in the future.
-
-    Returns:
-        A mapping from a pipeline name to a ``Pipeline`` object.
-
-    """
-    
-    dep = de.create_pipeline()
-    dsp = ds.create_pipeline()
+from kedro.pipeline import node, Pipeline
+from kedro_tutorial.pipelines.data_engineering.nodes import (
+    preprocess_companies,
+    preprocess_shuttles,
+    create_master_table,
+)
 
 
-    return {"de": dep,
-            "ds": dsp,
-            "__default__": dep + dsp}
+def create_pipeline(**kwargs):
+    return Pipeline(
+        [
+            node(
+                func=preprocess_companies,
+                inputs="companies",
+                outputs="preprocessed_companies",
+                name="preprocessing_companies",
+            ),
+            node(
+                func=preprocess_shuttles,
+                inputs="shuttles",
+                outputs="preprocessed_shuttles",
+                name="preprocessing_shuttles",
+            ),
+            node(
+                func=create_master_table,
+                inputs=["preprocessed_shuttles", "preprocessed_companies", "reviews"],
+                outputs="master_table",
+                name="master_table",
+            ),
+        ]
+    )

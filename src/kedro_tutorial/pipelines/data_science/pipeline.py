@@ -26,30 +26,32 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Construction of the master pipeline.
+"""
+This is a boilerplate pipeline 'data_science'
+generated using Kedro 0.16.4
 """
 
-from typing import Dict
+from kedro.pipeline import Pipeline, node
 
-from kedro.pipeline import Pipeline
-from .pipelines import data_engineering as de
-from .pipelines import data_science as ds
+from kedro_tutorial.pipelines.data_science.nodes import (
+    evaluate_model,
+    split_data,
+    train_model,
+)
 
-def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
-    """Create the project's pipeline.
-
-    Args:
-        kwargs: Ignore any additional arguments added in the future.
-
-    Returns:
-        A mapping from a pipeline name to a ``Pipeline`` object.
-
-    """
-    
-    dep = de.create_pipeline()
-    dsp = ds.create_pipeline()
-
-
-    return {"de": dep,
-            "ds": dsp,
-            "__default__": dep + dsp}
+def create_pipeline(**kwargs):
+    return Pipeline(
+        [
+            node(
+                func=split_data,
+                inputs=["master_table", "parameters"],
+                outputs=["X_train", "X_test", "y_train", "y_test"],
+            ),
+            node(func=train_model, inputs=["X_train", "y_train"], outputs="regressor"),
+            node(
+                func=evaluate_model,
+                inputs=["regressor", "X_test", "y_test"],
+                outputs=None,
+            ),
+        ]
+    )

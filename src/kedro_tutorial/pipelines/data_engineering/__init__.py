@@ -25,31 +25,9 @@
 #
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
-"""Construction of the master pipeline.
+"""
+This is a boilerplate pipeline 'data_engineering'
+generated using Kedro 0.16.4
 """
 
-from typing import Dict
-
-from kedro.pipeline import Pipeline
-from .pipelines import data_engineering as de
-from .pipelines import data_science as ds
-
-def create_pipelines(**kwargs) -> Dict[str, Pipeline]:
-    """Create the project's pipeline.
-
-    Args:
-        kwargs: Ignore any additional arguments added in the future.
-
-    Returns:
-        A mapping from a pipeline name to a ``Pipeline`` object.
-
-    """
-    
-    dep = de.create_pipeline()
-    dsp = ds.create_pipeline()
-
-
-    return {"de": dep,
-            "ds": dsp,
-            "__default__": dep + dsp}
+from .pipeline import create_pipeline  # NOQA
